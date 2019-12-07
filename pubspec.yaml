@@ -41,6 +41,8 @@ dependencies:
   solid_bottom_sheet: ^0.1.8
   rflutter_alert: ^1.0.3
   flutter_date_pickers: ^0.0.6
+  popup_menu: ^1.0.5
+  expandable: ^3.0.1
 
 dev_dependencies:
   flutter_test:

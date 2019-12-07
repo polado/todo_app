@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'package:solid_bottom_sheet/solid_bottom_sheet.dart';
@@ -17,6 +18,12 @@ class _HomePageState extends State<HomePage>
   AnimationController animationController;
 
   SolidController solidController = new SolidController();
+
+  TextEditingController textEditingController = new TextEditingController();
+
+  bool isEditCategory = false;
+
+  Category category;
 
   List<Category> categories = new List();
 
@@ -47,6 +54,13 @@ class _HomePageState extends State<HomePage>
       bottomSheet: bottomSheet(),
       appBar: AppBar(
         title: new Text("Todo App"),
+        actions: <Widget>[
+          FlatButton(
+              onPressed: () {
+                FirebaseAuth.instance.signOut();
+              },
+              child: Text("Sign Out"))
+        ],
       ),
 //      extendBody: true,
       bottomNavigationBar: BottomAppBar(
@@ -131,7 +145,12 @@ class _HomePageState extends State<HomePage>
 //        )).show();
 //  }
 
-  addNewCategory(String name) async {
+  addEditCategory(String name) async {
+    if (isEditCategory)
+      category.name = name;
+    else
+      category = new Category(name: name, tasks: new List());
+
     ProgressDialog pr = new ProgressDialog(context,
         type: ProgressDialogType.Normal, isDismissible: false, showLogs: false);
     pr.style(
@@ -139,7 +158,13 @@ class _HomePageState extends State<HomePage>
         message: 'Loading...',
         borderRadius: 8);
     pr.show();
-    await categoryBloc.addCategory(new Category(name: name, tasks: new List()));
+    await categoryBloc.addEditCategory(category, isEditCategory);
+    setState(() {
+      if (!isEditCategory)
+        categories.add(new Category(name: name, tasks: new List()));
+      category = null;
+      isEditCategory = false;
+    });
     pr.dismiss();
   }
 
@@ -155,7 +180,6 @@ class _HomePageState extends State<HomePage>
   }
 
   panel() {
-    TextEditingController textEditingController = new TextEditingController();
     return Container(
       padding: EdgeInsets.only(top: 25),
       child: ListView(
@@ -183,7 +207,7 @@ class _HomePageState extends State<HomePage>
                   textEditingController.text.trim().isNotEmpty) {
                 animationController.reverse();
                 solidController.hide();
-                addNewCategory(textEditingController.text.trim());
+                addEditCategory(textEditingController.text.trim());
                 textEditingController.clear();
               }
             },
@@ -199,14 +223,26 @@ class _HomePageState extends State<HomePage>
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (snapshot.hasData)
           return snapshot.data.documents.length == 0
-              ? Center(child: Text('Add your first category...', style: TextStyle(fontSize: 24),),)
+              ? Center(
+            child: Text(
+              'Add your first category...',
+              style: TextStyle(fontSize: 24),
+            ),
+          )
               : ListView.builder(
                   padding: EdgeInsets.all(8),
                   itemCount: snapshot.data.documents.length,
                   itemBuilder: (context, index) {
                     return new CategoryWidget(
-                        category: new Category.firebase(
-                            snapshot.data.documents[index]));
+                      category:
+                      new Category.firebase(snapshot.data.documents[index]),
+                      editCallback: (Category category) {
+//                        textEditingController.text = category.name;
+//                        isEditCategory = true;
+//                        animationController.forward();
+//                        solidController.show();
+                      },
+                    );
                   },
                 );
         else

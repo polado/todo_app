@@ -4,22 +4,37 @@ import 'package:todo_app/core/models/category.dart';
 import 'package:todo_app/core/models/task.dart';
 
 class TaskBloc {
-  addTask(Category category, Task task) async {
+  addEditTask(Category category, Task task, bool isEdit) async {
     Timestamp time = Timestamp.now();
-    await Firestore.instance
-        .collection('users')
-        .document(AppCache.firebaseUser.uid)
-        .collection('categories')
-        .document(category.id)
-        .collection('tasks')
-        .document()
-        .setData({
-      'time': time,
-      'title': task.title,
-      'description': task.description,
-      'due_date': task.dueDate,
-      'is_done': task.isDone,
-    });
+    if (isEdit)
+      Firestore.instance
+          .collection('users')
+          .document(AppCache.firebaseUser.uid)
+          .collection('categories')
+          .document(category.id)
+          .collection('tasks')
+          .document(task.id)
+          .updateData({
+        'title': task.title,
+        'description': task.description,
+        'due_date': task.dueDate,
+      });
+    else
+      Firestore.instance
+          .collection('users')
+          .document(AppCache.firebaseUser.uid)
+          .collection('categories')
+          .document(category.id)
+          .collection('tasks')
+          .document()
+          .setData({
+        'time': time,
+        'title': task.title,
+        'description': task.description,
+        'due_date': task.dueDate,
+        'is_done': task.isDone,
+      });
+
     return true;
   }
 

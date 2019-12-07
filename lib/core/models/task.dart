@@ -15,6 +15,13 @@ class Task {
       this.addedDate,
       this.dueDate});
 
+  Task.edit({this.id,
+    this.title,
+    this.description,
+    this.isDone,
+    this.addedDate,
+    this.dueDate});
+
   Task.firebase(DocumentSnapshot snapshot) {
     this.id = snapshot.documentID;
     this.title = snapshot['title'];
