@@ -1,49 +1,35 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:todo_app/core/app_cache.dart';
-import 'package:todo_app/core/models/category.dart';
-import 'package:todo_app/core/models/task.dart';
+import 'package:todo_app/core/models/category_model.dart';
+import 'package:todo_app/core/models/task_model.dart';
 
 class TaskBloc {
-  addEditTask(Category category, Task task, bool isEdit) async {
+  addTask(TaskModel task) async {
     Timestamp time = Timestamp.now();
-    if (isEdit)
-      Firestore.instance
-          .collection('users')
-          .document(AppCache.firebaseUser.uid)
-          .collection('categories')
-          .document(category.id)
-          .collection('tasks')
-          .document(task.id)
-          .updateData({
-        'title': task.title,
-        'description': task.description,
-        'due_date': task.dueDate,
-      });
-    else
-      Firestore.instance
-          .collection('users')
-          .document(AppCache.firebaseUser.uid)
-          .collection('categories')
-          .document(category.id)
-          .collection('tasks')
-          .document()
-          .setData({
-        'time': time,
-        'title': task.title,
-        'description': task.description,
-        'due_date': task.dueDate,
-        'is_done': task.isDone,
-      });
-
+    await Firestore.instance
+        .collection('users')
+        .document(AppCache.instance
+        .getUser()
+        .uid)
+        .collection('tasks')
+        .document()
+        .setData({
+      'time': time,
+      'title': task.title,
+      'description': task.description,
+      'due_date': task.dueDate,
+      'is_done': task.isDone,
+      'category': task.category.toJson()
+    });
     return true;
   }
 
-  toggleTaskIsDone(Category category, Task task) async {
+  toggleTaskIsDone(CategoryModel category, TaskModel task) async {
     await Firestore.instance
         .collection('users')
-        .document(AppCache.firebaseUser.uid)
-        .collection('categories')
-        .document(category.id)
+        .document(AppCache.instance
+        .getUser()
+        .uid)
         .collection('tasks')
         .document(task.id)
         .updateData({

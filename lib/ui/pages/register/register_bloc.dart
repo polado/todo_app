@@ -1,9 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:todo_app/base/base_bloc.dart';
+import 'package:todo_app/base/base_view.dart';
 import 'package:todo_app/core/app_cache.dart';
 
-class RegisterBloc {
+class RegisterBloc extends BaseBloc {
   FirebaseUser firebaseUser;
+
+  RegisterBloc(BaseView view) : super(view);
 
   emailPasswordLogin(String email, String password) async {
     try {
@@ -12,7 +16,7 @@ class RegisterBloc {
       FirebaseUser user = result.user;
       firebaseUser = user;
       AppCache.isLoggedIn = true;
-      AppCache.firebaseUser = user;
+      AppCache.instance.setUser(user);
       print('login ${result.toString()}');
       return true;
     } catch (e) {
@@ -27,7 +31,7 @@ class RegisterBloc {
           .createUserWithEmailAndPassword(email: email, password: password);
       FirebaseUser user = result.user;
       AppCache.isLoggedIn = true;
-      AppCache.firebaseUser = user;
+      AppCache.instance.setUser(user);
       await updateUser(user, name);
       print('sign up ${result.toString()}');
       return true;
@@ -54,6 +58,8 @@ class RegisterBloc {
     firebaseUser = user;
     return true;
   }
-}
 
-final registerBloc = RegisterBloc();
+  @override
+  void onDispose() {
+  }
+}

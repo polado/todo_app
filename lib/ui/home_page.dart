@@ -1,12 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'package:solid_bottom_sheet/solid_bottom_sheet.dart';
+import 'package:todo_app/constants.dart';
 import 'package:todo_app/core/app_cache.dart';
-import 'package:todo_app/core/blocs/category_bloc.dart';
-import 'package:todo_app/core/models/category.dart';
-import 'package:todo_app/ui/category_widget.dart';
+import 'package:todo_app/core/models/category_model.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -19,23 +17,18 @@ class _HomePageState extends State<HomePage>
 
   SolidController solidController = new SolidController();
 
-  TextEditingController textEditingController = new TextEditingController();
-
-  bool isEditCategory = false;
-
-  Category category;
-
-  List<Category> categories = new List();
+  List<CategoryModel> categories = new List();
 
   Stream<QuerySnapshot> categoriesStream;
 
   @override
   void initState() {
     super.initState();
-
     categoriesStream = Firestore.instance
         .collection('users')
-        .document(AppCache.firebaseUser.uid)
+        .document(AppCache.instance
+        .getUser()
+        .uid)
         .collection('categories')
         .orderBy('time', descending: true)
         .snapshots();
@@ -49,27 +42,22 @@ class _HomePageState extends State<HomePage>
 
   @override
   Widget build(BuildContext context) {
-    categories.add(new Category(name: "Name", tasks: new List()));
+//    categories.add(new Category(name: "Name", tasks: new List()));
     return Scaffold(
       bottomSheet: bottomSheet(),
       appBar: AppBar(
+        elevation: Constants.elevation,
         title: new Text("Todo App"),
-        actions: <Widget>[
-          FlatButton(
-              onPressed: () {
-                FirebaseAuth.instance.signOut();
-              },
-              child: Text("Sign Out"))
-        ],
       ),
-//      extendBody: true,
+      extendBody: true,
       bottomNavigationBar: BottomAppBar(
         shape: CircularNotchedRectangle(),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
             Expanded(
-              child: IconButton(icon: Icon(Icons.check_box), onPressed: () {}),
+              child: IconButton(
+                  icon: Icon(Icons.check_circle), onPressed: () {}),
             ),
             Expanded(
               child: Divider(color: Colors.transparent),
@@ -100,57 +88,7 @@ class _HomePageState extends State<HomePage>
     );
   }
 
-//  addNewCategoryDialog() {
-//    TextEditingController textEditingController = new TextEditingController();
-//    Alert(
-//        context: context,
-//        title: "Add New Category",
-//        content: Container(
-//          padding: EdgeInsets.only(top: 16),
-//          child: TextField(
-//            controller: textEditingController,
-//            textCapitalization: TextCapitalization.sentences,
-//            decoration: InputDecoration(
-//              labelText: 'Category Name..',
-//              hintText: "Enter Your Category Name Here",
-//              border:
-//                  OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-//            ),
-//          ),
-//        ),
-//        buttons: [
-//          DialogButton(
-//            onPressed: () {
-//              if (textEditingController.text != null &&
-//                  textEditingController.text.trim().isNotEmpty) {
-//                Navigator.pop(context);
-//                addNewCategory(textEditingController.text.trim());
-//                textEditingController.clear();
-//              }
-//            },
-//            child: Text(
-//              "Add",
-//              style: TextStyle(fontSize: 18),
-//            ),
-//            radius: BorderRadius.circular(8),
-//          ),
-//        ],
-//        style: AlertStyle(
-//          animationType: AnimationType.grow,
-//          buttonAreaPadding: EdgeInsets.all(8),
-//          alertBorder:
-//              RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-//          animationDuration: Duration(milliseconds: 400),
-//          isCloseButton: false,
-//        )).show();
-//  }
-
-  addEditCategory(String name) async {
-    if (isEditCategory)
-      category.name = name;
-    else
-      category = new Category(name: name, tasks: new List());
-
+  addNewCategory(String name) async {
     ProgressDialog pr = new ProgressDialog(context,
         type: ProgressDialogType.Normal, isDismissible: false, showLogs: false);
     pr.style(
@@ -158,13 +96,7 @@ class _HomePageState extends State<HomePage>
         message: 'Loading...',
         borderRadius: 8);
     pr.show();
-    await categoryBloc.addEditCategory(category, isEditCategory);
-    setState(() {
-      if (!isEditCategory)
-        categories.add(new Category(name: name, tasks: new List()));
-      category = null;
-      isEditCategory = false;
-    });
+//    await categoryBloc.addCategory(new Category(name: name, tasks: new List()));
     pr.dismiss();
   }
 
@@ -175,11 +107,12 @@ class _HomePageState extends State<HomePage>
       body: panel(),
       maxHeight: 175,
       controller: solidController,
-      smoothness: Smoothness.high,
+      smoothness: Smoothness.low,
     );
   }
 
   panel() {
+    TextEditingController textEditingController = new TextEditingController();
     return Container(
       padding: EdgeInsets.only(top: 25),
       child: ListView(
@@ -207,7 +140,7 @@ class _HomePageState extends State<HomePage>
                   textEditingController.text.trim().isNotEmpty) {
                 animationController.reverse();
                 solidController.hide();
-                addEditCategory(textEditingController.text.trim());
+                addNewCategory(textEditingController.text.trim());
                 textEditingController.clear();
               }
             },
@@ -230,19 +163,14 @@ class _HomePageState extends State<HomePage>
             ),
           )
               : ListView.builder(
-                  padding: EdgeInsets.all(8),
+            padding: EdgeInsetsDirectional.only(
+                top: 8, start: 8, end: 8, bottom: 72),
                   itemCount: snapshot.data.documents.length,
                   itemBuilder: (context, index) {
-                    return new CategoryWidget(
-                      category:
-                      new Category.firebase(snapshot.data.documents[index]),
-                      editCallback: (Category category) {
-//                        textEditingController.text = category.name;
-//                        isEditCategory = true;
-//                        animationController.forward();
-//                        solidController.show();
-                      },
-                    );
+//                    return new CategoryWidget(
+//                        category: new Category.firebase(
+//                            snapshot.data.documents[index]));
+                    return Container();
                   },
                 );
         else

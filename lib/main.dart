@@ -1,72 +1,37 @@
+import 'package:bot_toast/bot_toast.dart';
 import 'package:dynamic_theme/dynamic_theme.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter/material.dart';
+import 'package:todo_app/base/base_state.dart';
+import 'package:todo_app/constants.dart';
 import 'package:todo_app/core/app_cache.dart';
 import 'package:todo_app/themes.dart';
-import 'package:todo_app/ui/category_widget.dart';
-import 'package:todo_app/ui/home_page.dart';
-import 'package:todo_app/ui/register_page.dart';
+import 'package:todo_app/ui/pages/host/host_page.dart';
+import 'package:todo_app/ui/pages/register/register_page.dart';
 
-import 'core/blocs/register_bloc.dart';
-import 'core/models/category.dart';
-import 'core/models/task.dart';
-
-void main() => runApp(MyApp());
-
-
-const MaterialColor white = const MaterialColor(
-  0xFFFFFFFF,
-  const <int, Color>{
-    50: const Color(0xFFFFFFFF),
-    100: const Color(0xFFFFFFFF),
-    200: const Color(0xFFFFFFFF),
-    300: const Color(0xFFFFFFFF),
-    400: const Color(0xFFFFFFFF),
-    500: const Color(0xFFFFFFFF),
-    600: const Color(0xFFFFFFFF),
-    700: const Color(0xFFFFFFFF),
-    800: const Color(0xFFFFFFFF),
-    900: const Color(0xFFFFFFFF),
-  },
-);
-
-const MaterialColor black = const MaterialColor(
-  0xFF000000,
-  const <int, Color>{
-    50: const Color(0xFF000000),
-    100: const Color(0xFF000000),
-    200: const Color(0xFF000000),
-    300: const Color(0xFF000000),
-    400: const Color(0xFF000000),
-    500: const Color(0xFF000000),
-    600: const Color(0xFF000000),
-    700: const Color(0xFF000000),
-    800: const Color(0xFF000000),
-    900: const Color(0xFF000000),
-  },
-);
-
+void main() => runApp(BotToastInit(child: MyApp()));
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return new DynamicTheme(
-        defaultBrightness: Brightness.dark,
-        data: (brightness) => ThemeData(
-
-          primarySwatch: white,
-          accentColor: black,
-        ),
-        themedWidgetBuilder: (context, theme) {
-          return MaterialApp(
-            debugShowCheckedModeBanner: false,
-            title: 'Flutter Demo',
-            theme: theme,
-            home: SplashScreen(),
-          );
-        });
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Flutter Demo',
+      theme: ThemeData(
+        brightness: Brightness.light,
+        primaryColor: Colors.white,
+        accentColor: Color(0xFFff8463),
+        cardColor: Colors.white,
+        scaffoldBackgroundColor: Color(0xFFF5F5F5),
+        appBarTheme: AppBarTheme(
+            color: Color(0xFFF5F5F5), elevation: Constants.elevation),
+        buttonColor: Colors.cyan,
+      ),
+      navigatorObservers: [BotToastNavigatorObserver()],
+      home: SplashScreen(),
+    );
   }
 }
 
@@ -75,26 +40,20 @@ class SplashScreen extends StatefulWidget {
   _SplashScreenState createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
+class _SplashScreenState extends BaseState<SplashScreen> {
   @override
-  Widget build(BuildContext context) {
+  Widget buildWidget(BuildContext context) {
     return StreamBuilder<FirebaseUser>(
       stream: FirebaseAuth.instance.onAuthStateChanged,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.active) {
           FirebaseUser user = snapshot.data;
           if (user == null) return RegisterPage();
-
-          registerBloc.firebaseUser = user;
+          AppCache.instance.setUser(user);
           AppCache.isLoggedIn = true;
-          AppCache.firebaseUser = user;
-          return HomePage();
+          return HostPage();
         } else {
-          return Scaffold(
-            body: Center(
-              child: CircularProgressIndicator(),
-            ),
-          );
+          return Scaffold(body: Center(child: CircularProgressIndicator()));
         }
       },
     );
@@ -200,20 +159,20 @@ class _MyHomePageState extends State<MyHomePage> {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          CategoryWidget(
-            category: new Category(name: 'Main Category', color: 'red', tasks: [
-              new Task(
-                  title: 'Title',
-                  isDone: true,
-                  description:
-                      'It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.'),
-              new Task(
-                  title: 'Title',
-                  isDone: false,
-                  description:
-                      'It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.')
-            ]),
-          ),
+//          CategoryWidget(
+//            category: new Category(name: 'Main Category', color: 'red', tasks: [
+//              new Task(
+//                  title: 'Title',
+//                  isDone: true,
+//                  description:
+//                      'It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.'),
+//              new Task(
+//                  title: 'Title',
+//                  isDone: false,
+//                  description:
+//                      'It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.')
+//            ]),
+//          ),
           Text(
             '$_counter',
             style: Theme.of(context).textTheme.display1,
