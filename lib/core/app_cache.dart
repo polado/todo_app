@@ -7,7 +7,7 @@ class AppCache {
 
   AppCache._private();
 
-  static AppCache get instance {
+  factory AppCache() {
     return _instance;
   }
 
@@ -18,13 +18,22 @@ class AppCache {
   static String apiToken;
 
   FirebaseUser firebaseUser;
-  static User loggedUser;
+  UserModel user;
 
-  void setUser(FirebaseUser firebaseUser) {
+  void setFirebaseUser(FirebaseUser firebaseUser) {
+    print("object setFirebaseUser");
     this.firebaseUser = firebaseUser;
   }
 
-  FirebaseUser getUser() {
+  FirebaseUser getFirebaseUser() {
     return firebaseUser;
+  }
+
+  void setUser(UserModel user) {
+    this.user = user;
+  }
+
+  UserModel getUser() {
+    return user;
   }
 }

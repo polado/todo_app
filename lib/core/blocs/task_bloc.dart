@@ -8,8 +8,8 @@ class TaskBloc {
     Timestamp time = Timestamp.now();
     await Firestore.instance
         .collection('users')
-        .document(AppCache.instance
-        .getUser()
+        .document(AppCache()
+        .getFirebaseUser()
         .uid)
         .collection('tasks')
         .document()
@@ -27,8 +27,8 @@ class TaskBloc {
   toggleTaskIsDone(CategoryModel category, TaskModel task) async {
     await Firestore.instance
         .collection('users')
-        .document(AppCache.instance
-        .getUser()
+        .document(AppCache()
+        .getFirebaseUser()
         .uid)
         .collection('tasks')
         .document(task.id)

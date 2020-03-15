@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_date_pickers/flutter_date_pickers.dart' as datePicker;
 import 'package:todo_app/base/base_state.dart';
 import 'package:todo_app/constants.dart';
+import 'package:todo_app/core/app_cache.dart';
 import 'package:todo_app/core/blocs/task_bloc.dart';
 import 'package:todo_app/core/models/category_model.dart';
 import 'package:todo_app/core/models/task_model.dart';
@@ -14,23 +15,22 @@ class AddTaskPage extends StatefulWidget {
 }
 
 class _AddTaskPageState extends BaseState<AddTaskPage> {
-  var _categories = [
-    new CategoryModel('Small', Colors.green),
-    new CategoryModel('Small', Colors.blue),
-    new CategoryModel('Medium', Colors.indigo),
-    new CategoryModel('Large', Colors.deepOrange),
-    new CategoryModel('Large', Colors.orange),
-    new CategoryModel('Large', Colors.pink),
-    new CategoryModel('XLarge', Colors.purple),
-    new CategoryModel('XLarge', Colors.deepPurple),
-  ];
-  int _value = 1;
+  List<CategoryModel> _categories = new List();
+  int _value = 0;
 
   TextEditingController _nameController = new TextEditingController();
   TextEditingController _descController = new TextEditingController();
 
   DateTime selectedDate = DateTime.now();
   DateTime startDate = DateTime.now().subtract(new Duration(days: 1));
+
+  @override
+  void initState() {
+    super.initState();
+    _categories = AppCache()
+        .getUser()
+        .categories;
+  }
 
   @override
   Widget buildWidget(BuildContext context) {

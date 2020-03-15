@@ -23,7 +23,9 @@ class _TasksPageState extends BaseState<TasksPage> {
         child: StreamBuilder(
           stream: Firestore.instance
               .collection('users')
-              .document(AppCache.instance.getUser().uid)
+              .document(AppCache()
+              .getFirebaseUser()
+              .uid)
               .collection('tasks')
               .orderBy('time', descending: true)
               .snapshots(),
@@ -34,7 +36,15 @@ class _TasksPageState extends BaseState<TasksPage> {
                   .map((t) => TaskModel.firebase(t))
                   .toList();
               return Column(
-                children: tasks.map((t) => TaskWidget(task: t)).toList(),
+                children: tasks
+                    .map((t) =>
+                    TaskWidget(
+                      task: t,
+                      onDismiss: (direction) {
+                        print('dismiss $direction');
+                      },
+                    ))
+                    .toList(),
               );
             } else if (snapshot.hasError) {
               return Center(

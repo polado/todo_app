@@ -10,9 +10,8 @@ class CategoryModel {
 
   CategoryModel(this.name, this.color);
 
-  CategoryModel.firebase(DocumentSnapshot snapshot) {
-    this.id = snapshot.documentID;
-    this.color = snapshot['color'];
+  CategoryModel.firebase(Map<String, dynamic> snapshot) {
+    this.color = Color(snapshot['color']);
     this.name = snapshot['name'];
   }
 

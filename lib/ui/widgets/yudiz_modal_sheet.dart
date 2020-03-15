@@ -101,7 +101,7 @@ class _YudizModalSheetState extends State<YudizModalSheet>
   @override
   Widget build(BuildContext context) {
     var width = MediaQuery.of(context).size.width;
-
+    print("object $width");
     return WillPopScope(
         onWillPop: onBackPressed,
         child: GestureDetector(

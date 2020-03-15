@@ -26,8 +26,8 @@ class _HomePageState extends State<HomePage>
     super.initState();
     categoriesStream = Firestore.instance
         .collection('users')
-        .document(AppCache.instance
-        .getUser()
+        .document(AppCache()
+        .getFirebaseUser()
         .uid)
         .collection('categories')
         .orderBy('time', descending: true)
