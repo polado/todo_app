@@ -10,9 +10,19 @@ class CategoryModel {
 
   CategoryModel(this.name, this.color);
 
-  CategoryModel.firebase(Map<String, dynamic> snapshot) {
+  CategoryModel.firebase(DocumentSnapshot snapshot) {
+    this.id = snapshot.documentID;
     this.color = Color(snapshot['color']);
     this.name = snapshot['name'];
+  }
+
+  static List<CategoryModel> fromList(QuerySnapshot snapshot) {
+    List<CategoryModel> categories = new List();
+    snapshot.documents.forEach((d) {
+      categories.add(new CategoryModel.firebase(d));
+    });
+
+    return categories;
   }
 
   setTasks(QuerySnapshot snapshot) {

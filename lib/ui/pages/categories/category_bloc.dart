@@ -13,42 +13,33 @@ class CategoriesBloc extends BaseBloc {
   CategoriesBloc(BaseView view) : super(view);
 
   addCategory(CategoryModel category) async {
-    await Firestore.instance
-        .collection('users')
-        .document(AppCache()
-        .getFirebaseUser()
-        .uid)
-        .updateData({
-      'categories': FieldValue.arrayUnion([
-        {'name': category.name, 'color': category.color.value}
-      ])
-    });
-    return true;
-  }
-
-  editCategory(CategoryModel oldCategory, CategoryModel category) async {
-    await Firestore.instance
-        .collection('users')
-        .document(AppCache()
-        .getFirebaseUser()
-        .uid)
-        .updateData({
-      'categories': FieldValue.arrayRemove([
-        {'name': oldCategory.name, 'color': oldCategory.color.value}
-      ])
-    });
-    return addCategory(category);
-  }
-
-  editColor(CategoryModel category) async {
+    Timestamp time = Timestamp.now();
     await Firestore.instance
         .collection('users')
         .document(AppCache()
         .getFirebaseUser()
         .uid)
         .collection('categories')
-        .document(category.id)
-        .updateData({'color': category.color});
+        .document()
+        .setData({
+      "time": time,
+      "name": category.name,
+      "color": category.color.value
+    });
+    return true;
+  }
+
+  editCategory(CategoryModel oldCategory, CategoryModel category) async {
+    print("edit category");
+    await Firestore.instance
+        .collection('users')
+        .document(AppCache()
+        .getFirebaseUser()
+        .uid)
+        .collection('categories')
+        .document(oldCategory.id)
+        .updateData({"name": oldCategory.name, "color": category.color.value});
+    return true;
   }
 
   @override

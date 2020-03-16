@@ -4,8 +4,11 @@ import 'package:todo_app/core/models/category_model.dart';
 import 'package:todo_app/core/models/task_model.dart';
 
 class TaskBloc {
-  addTask(TaskModel task) async {
+  addTask(CategoryModel category, TaskModel task) async {
     Timestamp time = Timestamp.now();
+    DocumentReference ref = Firestore.instance.collection('categories')
+        .document(category.id);
+
     await Firestore.instance
         .collection('users')
         .document(AppCache()
@@ -19,7 +22,7 @@ class TaskBloc {
       'description': task.description,
       'due_date': task.dueDate,
       'is_done': task.isDone,
-      'category': task.category.toJson()
+      'category': ref
     });
     return true;
   }
@@ -32,9 +35,7 @@ class TaskBloc {
         .uid)
         .collection('tasks')
         .document(task.id)
-        .updateData({
-      'is_done': task.isDone,
-    });
+        .updateData({'is_done': task.isDone});
   }
 }
 

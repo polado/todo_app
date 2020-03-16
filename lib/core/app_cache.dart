@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:todo_app/core/models/category_model.dart';
 
 import 'models/user.dart';
 
@@ -11,7 +12,7 @@ class AppCache {
     return _instance;
   }
 
-  static const String _KEY_USER = 'user';
+//  static const String _KEY_USER = 'user';
 
   static bool isLoggedIn = false;
 
@@ -19,9 +20,9 @@ class AppCache {
 
   FirebaseUser firebaseUser;
   UserModel user;
+  List<CategoryModel> categories;
 
   void setFirebaseUser(FirebaseUser firebaseUser) {
-    print("object setFirebaseUser");
     this.firebaseUser = firebaseUser;
   }
 
@@ -35,5 +36,13 @@ class AppCache {
 
   UserModel getUser() {
     return user;
+  }
+
+  void setCategories(List<CategoryModel> categories) {
+    this.categories = categories;
+  }
+
+  List<CategoryModel> getCategories() {
+    return categories;
   }
 }

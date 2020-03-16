@@ -54,11 +54,11 @@ class _HostPageState extends BaseState<HostPage>
             });
           },
           items: [
-            BottomNavigationBarItem(
-                icon: Icon(Icons.dashboard), title: Text("Tasks")),
 //            BottomNavigationBarItem(icon: Container(), title: Container()),
             BottomNavigationBarItem(
                 icon: Icon(Icons.library_books), title: Text("Categories")),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.dashboard), title: Text("Tasks")),
           ],
         ),
       ),
@@ -66,9 +66,9 @@ class _HostPageState extends BaseState<HostPage>
         controller: _tabController,
         physics: NeverScrollableScrollPhysics(),
         children: <Widget>[
+          CategoriesPage(),
           TasksPage(),
 //          Container(),
-          CategoriesPage(),
         ],
       ),
     );

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:todo_app/base/base_state.dart';
 import 'package:todo_app/core/app_cache.dart';
 import 'package:todo_app/core/models/category_model.dart';
-import 'package:todo_app/core/models/user.dart';
 import 'package:todo_app/ui/pages/categories/add_edit_category/add_edit_category_page.dart';
 
 class CategoriesPage extends StatefulWidget {
@@ -45,14 +44,14 @@ class _CategoriesPageState extends BaseState<CategoriesPage> {
               .document(AppCache()
               .getFirebaseUser()
               .uid)
+              .collection('categories')
+              .orderBy('time', descending: true)
               .snapshots(),
           builder:
-              (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+              (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
             if (snapshot.hasData) {
-              AppCache().setUser(new UserModel(snapshot.data));
-              _categories = AppCache()
-                  .getUser()
-                  .categories;
+              _categories = CategoryModel.fromList(snapshot.data);
+              AppCache().setCategories(_categories);
 
               return Container(
                 child: ListView(
@@ -66,8 +65,10 @@ class _CategoriesPageState extends BaseState<CategoriesPage> {
                           borderRadius: BorderRadius.circular(6)),
                       child: InkWell(
                         onTap: () {
-                          navigateTo(
-                              AddEditCategoryPage(isEdit: true, category: c,));
+                          navigateTo(AddEditCategoryPage(
+                            isEdit: true,
+                            category: c,
+                          ));
                         },
                         child: Container(
                           child: Row(

@@ -27,9 +27,7 @@ class _AddTaskPageState extends BaseState<AddTaskPage> {
   @override
   void initState() {
     super.initState();
-    _categories = AppCache()
-        .getUser()
-        .categories;
+    _categories = AppCache().getCategories();
   }
 
   @override
@@ -163,7 +161,7 @@ class _AddTaskPageState extends BaseState<AddTaskPage> {
   void _addTask() async {
     if (_validate()) {
       showLoading();
-      await taskBloc.addTask(new TaskModel(
+      await taskBloc.addTask(_categories[_value], new TaskModel(
         title: _nameController.text.trim(),
         description: _descController.text.trim(),
         dueDate: Timestamp.fromDate(selectedDate),
