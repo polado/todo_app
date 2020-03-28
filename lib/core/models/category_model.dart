@@ -25,6 +25,14 @@ class CategoryModel {
     return categories;
   }
 
+  static int getIndex(List<CategoryModel> list, CategoryModel model) {
+    int index = 0;
+    for (int i = 0; i < list.length; i++) {
+      if (list[i].id == model.id) index = i;
+    }
+    return index;
+  }
+
   setTasks(QuerySnapshot snapshot) {
     snapshot.documents.forEach((s) {
       TaskModel task = new TaskModel.firebase(s);

@@ -4,7 +4,6 @@ import 'package:flutter_material_color_picker/flutter_material_color_picker.dart
 import 'package:todo_app/base/base_state.dart';
 import 'package:todo_app/core/models/category_model.dart';
 import 'package:todo_app/ui/pages/categories/category_bloc.dart';
-import 'package:todo_app/ui/widgets/flat_button_widget.dart';
 
 class AddEditCategoryPage extends StatefulWidget {
   final CategoryModel category;
@@ -38,6 +37,9 @@ class _AddEditCategoryPageState extends BaseState<AddEditCategoryPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.isEdit ? "Edit Category" : "Add New Category"),
+        actions: <Widget>[
+          IconButton(icon: Icon(Icons.check), onPressed: _addCategory),
+        ],
       ),
       body: Container(
         child: ListView(
@@ -75,15 +77,6 @@ class _AddEditCategoryPageState extends BaseState<AddEditCategoryPage> {
                 elevation: 0,
                 allowShades: false,
                 onMainColorChange: (color) => _color = color,
-              ),
-            ),
-            SizedBox(height: 32),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              child: FlatButtonWidget(
-                callback: _addCategory,
-                textStyle: TextStyle(fontSize: 16),
-                text: widget.isEdit ? "Edit" : "Add",
               ),
             ),
             SizedBox(height: 16),

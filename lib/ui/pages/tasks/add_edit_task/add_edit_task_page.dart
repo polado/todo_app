@@ -7,18 +7,24 @@ import 'package:todo_app/core/app_cache.dart';
 import 'package:todo_app/core/blocs/task_bloc.dart';
 import 'package:todo_app/core/models/category_model.dart';
 import 'package:todo_app/core/models/task_model.dart';
-import 'package:todo_app/ui/widgets/flat_button_widget.dart';
 
-class AddTaskPage extends StatefulWidget {
+class AddEditTaskPage extends StatefulWidget {
+  final TaskModel task;
+  final CategoryModel category;
+  final bool isEdit;
+
+  const AddEditTaskPage({Key key, this.task, this.isEdit, this.category})
+      : super(key: key);
+
   @override
-  _AddTaskPageState createState() => _AddTaskPageState();
+  _AddEditTaskPageState createState() => _AddEditTaskPageState();
 }
 
-class _AddTaskPageState extends BaseState<AddTaskPage> {
+class _AddEditTaskPageState extends BaseState<AddEditTaskPage> {
   List<CategoryModel> _categories = new List();
   int _value = 0;
 
-  TextEditingController _nameController = new TextEditingController();
+  TextEditingController _titleController = new TextEditingController();
   TextEditingController _descController = new TextEditingController();
 
   DateTime selectedDate = DateTime.now();
@@ -26,8 +32,18 @@ class _AddTaskPageState extends BaseState<AddTaskPage> {
 
   @override
   void initState() {
-    super.initState();
     _categories = AppCache().getCategories();
+    super.initState();
+    if (widget.isEdit) {
+      _titleController.text = widget.task.title;
+      if (widget.task.description != null && widget.task.description.isNotEmpty)
+        _descController.text = widget.task.description;
+
+      selectedDate = new DateTime.fromMillisecondsSinceEpoch(
+          widget.task.dueDate.millisecondsSinceEpoch);
+
+      _value = CategoryModel.getIndex(_categories, widget.category);
+    }
   }
 
   @override
@@ -35,6 +51,9 @@ class _AddTaskPageState extends BaseState<AddTaskPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Add New Task"),
+        actions: <Widget>[
+          IconButton(icon: Icon(Icons.check), onPressed: _addTask),
+        ],
       ),
       body: Container(
         child: ListView(
@@ -76,7 +95,7 @@ class _AddTaskPageState extends BaseState<AddTaskPage> {
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 16),
               child: TextField(
-                controller: _nameController,
+                controller: _titleController,
                 textCapitalization: TextCapitalization.sentences,
                 style: TextStyle(fontSize: 18),
                 decoration: InputDecoration(
@@ -134,15 +153,6 @@ class _AddTaskPageState extends BaseState<AddTaskPage> {
                     maxDayPickerRowCount: 5),
               ),
             ),
-            SizedBox(height: 32),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              child: FlatButtonWidget(
-                callback: _addTask,
-                textStyle: TextStyle(fontSize: 16),
-                text: "Add",
-              ),
-            ),
             SizedBox(height: 16),
           ],
         ),
@@ -151,7 +161,7 @@ class _AddTaskPageState extends BaseState<AddTaskPage> {
   }
 
   bool _validate() {
-    if (_nameController.text.isEmpty) {
+    if (_titleController.text.isEmpty) {
       showErrorMsg("Enter Your Task");
       return false;
     } else if (_descController.text.isEmpty) _descController.text = "";
@@ -161,14 +171,16 @@ class _AddTaskPageState extends BaseState<AddTaskPage> {
   void _addTask() async {
     if (_validate()) {
       showLoading();
-      await taskBloc.addTask(_categories[_value], new TaskModel(
-        title: _nameController.text.trim(),
-        description: _descController.text.trim(),
-        dueDate: Timestamp.fromDate(selectedDate),
-        addedDate: Timestamp.now(),
-        category: _categories[_value],
-        isDone: false,
-      ));
+      await taskBloc.addTask(
+          _categories[_value],
+          new TaskModel(
+            title: _titleController.text.trim(),
+            description: _descController.text.trim(),
+            dueDate: Timestamp.fromDate(selectedDate),
+            addedDate: Timestamp.now(),
+            category: _categories[_value],
+            isDone: false,
+          ));
       hideLoading();
       Navigator.of(context).pop();
     }

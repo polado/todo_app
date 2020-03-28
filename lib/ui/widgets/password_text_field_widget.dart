@@ -40,10 +40,9 @@ class _PasswordFieldWidgetState extends State<PasswordFieldWidget> {
           decoration: InputDecoration(
             prefixIcon: Icon(Icons.lock),
             suffixIcon: IconButton(
-                icon: Icon(
-                  Icons.remove_red_eye,
-                  color: _obscureText ? Colors.grey : Colors.cyan,
-                ),
+                icon: _obscureText
+                    ? Icon(Icons.visibility_off, color: Colors.grey)
+                    : Icon(Icons.visibility, color: Colors.cyan),
                 onPressed: () {
                   setState(() {
                     _obscureText = !_obscureText;

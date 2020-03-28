@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:todo_app/core/models/category_model.dart';
 
-import 'models/user.dart';
+import 'models/user_model.dart';
 
 class AppCache {
   static final AppCache _instance = AppCache._private();

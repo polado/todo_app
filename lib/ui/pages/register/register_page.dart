@@ -60,7 +60,9 @@ class _RegisterPageState extends BaseState<RegisterPage> {
                           });
                       },
                       color: _isLogin
-                          ? Theme.of(context).buttonColor
+                          ? Theme
+                          .of(context)
+                          .accentColor
                           : Colors.white,
                       text: "Login",
                     ),
@@ -75,7 +77,9 @@ class _RegisterPageState extends BaseState<RegisterPage> {
                           });
                       },
                       color: !_isLogin
-                          ? Theme.of(context).buttonColor
+                          ? Theme
+                          .of(context)
+                          .accentColor
                           : Colors.white,
                       text: "Sign up",
                     ),
@@ -111,7 +115,6 @@ class _RegisterPageState extends BaseState<RegisterPage> {
               SizedBox(height: 32),
               FlatButtonWidget(
                 callback: _submit,
-                color: Theme.of(context).accentColor,
                 textStyle: TextStyle(fontSize: 16),
                 text: _isLogin ? "Login" : "Sign up",
               ),
@@ -124,22 +127,32 @@ class _RegisterPageState extends BaseState<RegisterPage> {
   }
 
   bool _validate() {
-    if (!_isLogin && _nameController.text.isEmpty) {
+    if (!_isLogin && _nameController.text
+        .trim()
+        .isEmpty) {
       showErrorMsg("Please enter your name");
       return false;
-    } else if (!_isLogin && _nameController.text.length < 4) {
+    } else if (!_isLogin && _nameController.text
+        .trim()
+        .length < 4) {
       showErrorMsg("Name must be at least 4 characters");
       return false;
-    } else if (_emailController.text.isEmpty) {
+    } else if (_emailController.text
+        .trim()
+        .isEmpty) {
       showErrorMsg("Please enter your email");
       return false;
-    } else if (!EmailValidator.validate(_emailController.text, true)) {
+    } else if (!EmailValidator.validate(_emailController.text.trim(), true)) {
       showErrorMsg("Please enter valid email");
       return false;
-    } else if (_passwordController.text.isEmpty) {
+    } else if (_passwordController.text
+        .trim()
+        .isEmpty) {
       showErrorMsg("Please enter your password");
       return false;
-    } else if (_passwordController.text.length < 6) {
+    } else if (_passwordController.text
+        .trim()
+        .length < 6) {
       showErrorMsg("Password must be at least 6 characters");
       return false;
     }
@@ -153,14 +166,14 @@ class _RegisterPageState extends BaseState<RegisterPage> {
         bool res = await _registerBloc.emailPasswordLogin(
             _emailController.text.trim(), _passwordController.text.trim());
         hideLoading();
-        if (!res) showErrorMsg("Something went wrong");
+        if (!res) showErrorMsg("User data not found!");
       } else {
         bool res = await _registerBloc.emailPasswordSignUp(
             _emailController.text.trim(),
             _passwordController.text.trim(),
             _nameController.text.trim());
         hideLoading();
-        if (!res) showErrorMsg("User data not found!");
+        if (!res) showErrorMsg("Something went wrong");
       }
     }
   }

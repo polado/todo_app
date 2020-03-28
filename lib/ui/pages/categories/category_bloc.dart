@@ -38,7 +38,7 @@ class CategoriesBloc extends BaseBloc {
         .uid)
         .collection('categories')
         .document(oldCategory.id)
-        .updateData({"name": oldCategory.name, "color": category.color.value});
+        .updateData({"name": category.name, "color": category.color.value});
     return true;
   }
 
